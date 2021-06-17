@@ -16,7 +16,7 @@ SELECT * FROM client WHERE LastName LIKE '%OV' OR '%OVA';
 
 -- 6. +Вивести клієнтів банку, які обслуговуються київськими відділеннями.
 SELECT * FROM client WHERE Department_idDepartment IN
-                           (SELECT idDepartment FROM department WHERE DepartmentCity ='Kyiv');
+(SELECT idDepartment FROM department WHERE DepartmentCity ='Kyiv');
 
 -- 7. +Вивести імена клієнтів та їхній паспорт, посортувати їх за іменами.
 SELECT FirstName,Passport FROM client ORDER BY FirstName;
@@ -57,20 +57,22 @@ GROUP BY c.idClient ORDER BY avgCreditSum DESC LIMIT 1;
 -- 15. Вивести відділення, яке видало в кредити найбільше грошей
 SELECT d.idDepartment,d.DepartmentCity,d.CountOfWorkers, SUM(a.Sum) as depCreditSum
 FROM department d JOIN client c ON d.idDepartment = c.Department_idDepartment
-                  JOIN  application a ON c.idClient = a.Client_idClient
+JOIN  application a ON c.idClient = a.Client_idClient
 GROUP BY d.idDepartment ORDER BY depCreditSum DESC LIMIT 1;
 
 -- 16. Вивести відділення, яке видало найбільший кредит.
 SELECT d.idDepartment,d.DepartmentCity,d.CountOfWorkers, MAX(a.Sum) as maxDepCreditSum
 FROM department d JOIN client c ON d.idDepartment = c.Department_idDepartment
-                  JOIN  application a ON c.idClient = a.Client_idClient
+JOIN  application a ON c.idClient = a.Client_idClient
 GROUP BY d.idDepartment ORDER BY maxDepCreditSum DESC LIMIT 1;
 --
 -- 17. Усім клієнтам, які мають вищу освіту, встановити усі їхні кредити у розмірі 6000 грн.
-UPDATE application SET Sum = 6000,Currency = 'Gryvnia' WHERE Client_idClient IN (SELECT idClient FROM client  WHERE Education = 'high' );
+UPDATE application SET Sum = 6000,Currency = 'Gryvnia' WHERE Client_idClient IN
+(SELECT idClient FROM client  WHERE Education = 'high' );
 
 -- 18. Усіх клієнтів київських відділень пересилити до Києва.
-UPDATE client SET City = 'Kyiv' WHERE Department_idDepartment IN (SELECT idDepartment FROM department WHERE DepartmentCity = 'Kyiv');
+UPDATE client SET City = 'Kyiv' WHERE Department_idDepartment IN
+(SELECT idDepartment FROM department WHERE DepartmentCity = 'Kyiv');
 --
 -- 19. Видалити усі кредити, які є повернені.
 DELETE FROM application WHERE CreditState = 'Returned';
@@ -78,15 +80,15 @@ DELETE FROM application WHERE CreditState = 'Returned';
 --
 -- 20. Видалити кредити клієнтів, в яких друга літера прізвища є голосною.
 DELETE FROM application WHERE Client_idClient IN
-(SELECT idClient FROM client
-WHERE  LastName LIKE '_o%' OR LastName LIKE '_a%' OR
+(SELECT idClient FROM client WHERE
+       LastName LIKE '_o%' OR LastName LIKE '_a%' OR
        LastName LIKE '_e%' OR LastName LIKE '_y%' OR
        LastName LIKE '_u%' OR LastName LIKE '_i%');
 
 -- Знайти львівські відділення, які видали кредитів на загальну суму більше ніж 5000
 SELECT d.idDepartment,d.DepartmentCity,d.CountOfWorkers, SUM(a.Sum) as depCreditSum
 FROM department d JOIN client c ON d.idDepartment = c.Department_idDepartment
-                  JOIN  application a ON c.idClient = a.Client_idClient
+JOIN  application a ON c.idClient = a.Client_idClient
 GROUP BY d.idDepartment HAVING depCreditSum >5000 AND d.DepartmentCity = 'Lviv';
 
 -- Знайти клієнтів, які повністю погасили кредити на суму більше ніж 5000
@@ -101,7 +103,7 @@ SELECT * FROM application WHERE CreditState = 'Not returned' ORDER BY Sum DESC L
 -- /*Знайти клієнта, сума кредиту якого найменша*/
 SELECT idClient,FirstName,LastName FROM client
 WHERE idClient IN (SELECT Client_idClient FROM application
-                   WHERE Sum IN (SELECT MIN(Sum) FROM application));
+WHERE Sum IN (SELECT MIN(Sum) FROM application));
 
 -- /*Знайти кредити, сума яких більша за середнє значення усіх кредитів*/
 SELECT * FROM application WHERE Sum > (SELECT AVG(SUM) FROM application);
