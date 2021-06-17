@@ -12,7 +12,7 @@ SELECT * FROM client where Education = 'high' ORDER BY LastName;
 SELECT * FROM application ORDER BY idApplication DESC LIMIT 5;
 
 -- 5. +Вивести усіх клієнтів, чиє прізвище закінчується на OV чи OVA.
-SELECT * FROM client WHERE LastName LIKE '%OV' OR '%OVA';
+SELECT * FROM client WHERE LastName LIKE '%OV' OR LastName LIKE '%OVA';
 
 -- 6. +Вивести клієнтів банку, які обслуговуються київськими відділеннями.
 SELECT * FROM client WHERE Department_idDepartment IN
@@ -26,10 +26,10 @@ SELECT * FROM client c JOIN application a ON c.idClient = a.Client_idClient
 WHERE a.Sum > 5000 AND a.CreditState = ' Not returned';
 
 -- 9. +Порахувати кількість клієнтів усіх відділень та лише львівських відділень.
-SELECT COUNT(*) FROM client;
-SELECT COUNT(*) AS lvivDepClientsNum FROM client c
-JOIN department d ON c.Department_idDepartment = d.idDepartment
-WHERE d.DepartmentCity = 'Lviv';
+SELECT (SELECT COUNT(*) FROM client) AS clientsNum,
+       (SELECT COUNT(*)  FROM client c
+        JOIN department d ON c.Department_idDepartment = d.idDepartment
+        WHERE d.DepartmentCity = 'Lviv') AS lvivClientsNum;
 
 -- 10. Знайти кредити, які мають найбільшу суму для кожного клієнта окремо.
 SELECT c.idClient, c.FirstName, c.LastName, MAX(a.Sum) as maxCreditSum
